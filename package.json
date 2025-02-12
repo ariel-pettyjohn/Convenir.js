@@ -1,19 +1,43 @@
 {
-  "name": "javascript",
-  "version": "1.0.0",
-  "description": "The JavaScript template",
+  "name": "convenir-js",
+  "version": "0.1.0",
+  "description": "JavaScript client library for interacting with the Convenir trusted serverless compute platform.",
+  "main": "dist/convenir.min.js",
+  "module": "dist/convenir.esm.js",
+  "source": "src/convenir.js",
   "scripts": {
     "start": "parcel ./src/index.html",
-    "build": "parcel build ./src/index.html"
+    "build": "parcel build ./src/convenir.js --target node",
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.2.0",
-    "parcel": "^2.0.0"
+    "@babel/core": "^7.22.9",
+    "@babel/preset-env": "^7.22.9",
+    "babel-jest": "^29.6.1",
+    "eslint": "^8.45.0",
+    "jest": "^29.6.1",
+    "parcel": "^2.9.3"
   },
   "keywords": [
-    "css",
-    "javascript"
+    "convenir",
+    "serverless",
+    "trusted compute",
+    "web3",
+    "oasis",
+    "ocean protocol",
+    "api3",
+    "blockchain",
+    "tee"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "ethers": "^5.7.2",
+    "libsodium-wrappers": "^0.7.13",
+    "uuid": "^9.0.0"
+  },
+  "author": "Your Name (or Your Team's Name)",
+  "license": "MIT",  
+  "repository": {
+    "type": "git"
+  }
 }
