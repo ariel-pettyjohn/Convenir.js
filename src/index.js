@@ -1,10 +1,16 @@
 // Convenir.js
-
-import { ethers } from "ethers";
-import { keccak256 } from "ethers/lib/utils";
+import { ethers, keccak256 } from "ethers";
 import { randomBytes } from "crypto"; // For Node.js.  For browsers, use a different library (e.g., crypto-js)
 import * as libsodium from "libsodium-wrappers";
 import { v4 as uuidv4 } from "uuid";
+
+// Import the ABIs (using the correct relative paths)
+const EnclaveServiceABI =
+  require("../artifacts/contracts/EnclaveService.sol/EnclaveService.json").abi;
+const CourierABI =
+  require("../artifacts/contracts/Courier.sol/Courier.json").abi;
+const CustodianABI =
+  require("../artifacts/contracts/Custodian.sol/Custodian.json").abi;
 
 // --- Utility Functions ---
 
@@ -15,7 +21,7 @@ import { v4 as uuidv4 } from "uuid";
  */
 function generateCommitmentHash(inputData) {
   const serializedData = JSON.stringify(inputData);
-  const hash = keccak256(ethers.utils.toUtf8Bytes(serializedData));
+  const hash = keccak256(ethers.toUtf8Bytes(serializedData)); // Correct for ethers v6
   return hash;
 }
 
@@ -63,7 +69,7 @@ class Enclave {
   constructor(address, provider) {
     this.address = address;
     this.provider = provider;
-    this.contract = new ethers.Contract(address, EnclaveABI, provider); //  EnclaveABI needs to be defined
+    this.contract = new ethers.Contract(address, EnclaveServiceABI, provider);
   }
 
   async getConfig() {
@@ -77,14 +83,14 @@ class Courier extends Enclave {
     super(address, provider);
     this.apiKey = apiKey;
     this.encryptionKey = encryptionKey; // Store the encryption key
-    this.contract = new ethers.Contract(address, CourierABI, provider); //  CourierABI needs to be defined
+    this.contract = new ethers.Contract(address, CourierABI, provider);
   }
 
   async makeRequest(airnode, endpointId, encodedParameters, inputData) {
     const commitmentHash = generateCommitmentHash(inputData);
 
     let encryptedData = null;
-    const config = await this.contract.getAttestationConfig();
+    //const config = await this.contract.getAttestationConfig(); //Not needed
 
     if (this.encryptionKey) {
       encryptedData = await encryptData(
@@ -114,7 +120,7 @@ class Custodian extends Enclave {
     super(address, provider);
     this.apiKey = apiKey;
     this.encryptionKey = encryptionKey; // Store the encryption key
-    this.contract = new ethers.Contract(address, CustodianABI, provider); //  CustodianABI needs to be defined
+    this.contract = new ethers.Contract(address, CustodianABI, provider);
     //this.ocean = new Ocean.Ocean(...); // Initialize Ocean.js -  Move to a separate function or method.
   }
 
@@ -142,7 +148,7 @@ class Custodian extends Enclave {
       contractAddress: this.address,
     };
     const commitmentHash = generateCommitmentHash(inputData);
-    //const config = await this.contract.getAttestationConfig();
+    //const config = await this.contract.getAttestationConfig(); //not needed
 
     let encryptedData = null;
     if (this.encryptionKey) {
@@ -194,7 +200,7 @@ class Custodian extends Enclave {
 
 class ProvenanceExplorer {
   constructor(providerUrl) {
-    this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
+    this.provider = new ethers.JsonRpcProvider(providerUrl); //v6
   }
 
   async getProvenanceRecord(txHash) {
